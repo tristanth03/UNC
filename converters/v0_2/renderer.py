@@ -190,7 +190,9 @@ def _extract_plot_captions(src):
 
 def render_code_cell(src, outputs):
     _code_counter[0] += 1
-    cid = f'code-{_code_counter[0]}'
+    n   = _code_counter[0]
+    cid = f'code-{n}'
+    oid = f'out-{n}'
     parts = [
         f'<button class="ctog" onclick="tog(\'{cid}\',this)">'
         f'<span class="ar">&#9658;</span> Source code</button>',
@@ -205,7 +207,13 @@ def render_code_cell(src, outputs):
     )
     if stdout_text:
         parts.append(
+            f'<button class="otog" onclick="tog(\'{oid}\',this)">'
+            f'<span class="ar">&#9658;</span> Output</button>'
+        )
+        parts.append(
+            f'<div class="cdraw" id="{oid}">'
             f'<div class="cell-out"><pre>{esc(stdout_text.rstrip())}</pre></div>'
+            f'</div>'
         )
 
     # ── PNG plot outputs ──

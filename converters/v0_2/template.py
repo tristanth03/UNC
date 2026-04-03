@@ -37,18 +37,27 @@ strong{font-weight:600;}
 code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
 .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
 .katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
-.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog{display:none;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
 .ctog:hover{color:var(--acc);}
+html.show-src .ctog{display:flex;}
+.otog{display:none;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.otog:hover{color:var(--acc);}
+html.show-out .otog{display:flex;}
 .ar{display:inline-block;transition:transform .18s;}
-.ctog.open .ar{transform:rotate(90deg);}
+.ctog.open .ar,.otog.open .ar{transform:rotate(90deg);}
 .cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
 .cdraw.open{display:block;}
 pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
 .rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
 .toc::-webkit-scrollbar{width:4px;}
 .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.cell-out{background:var(--code-bg);border-left:3px solid var(--border);border-radius:0 4px 4px 0;padding:.65rem 1rem;margin-top:.35rem;overflow-x:auto;}
+.cell-out{border-left:3px solid var(--border);border-radius:0 4px 4px 0;padding:.65rem 1rem;overflow-x:auto;}
 .cell-out pre{color:var(--sub);}
+.gswrap{padding:.55rem 1.3rem .7rem;border-top:1px solid var(--sidebar-border);margin-top:.4rem;}
+.gsw{display:flex;align-items:center;gap:.5rem;width:100%;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.28rem 0;border:none;background:none;text-align:left;}
+.gsw:hover,.gsw.on{color:var(--acc);}
+.gar{display:inline-block;font-size:.55rem;transition:transform .18s;}
+.gsw.on .gar{transform:rotate(90deg);}
 .plot-fig{margin:1.2rem 0 1.6rem;text-align:center;}
 .plot-cap{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:.45rem;}
 .plot-img{max-width:100%;border-radius:4px;border:1px solid var(--border);}
@@ -63,6 +72,19 @@ tr:nth-child(even) td{background:rgba(0,0,0,.02);}
 
 JS = """<script>
 function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleGlobal(type){
+  var cls=type==='src'?'show-src':'show-out';
+  var btnCls=type==='src'?'.ctog':'.otog';
+  var isOn=document.documentElement.classList.toggle(cls);
+  document.getElementById('gsw-'+type).classList.toggle('on',isOn);
+  if(!isOn){
+    document.querySelectorAll(btnCls+'.open').forEach(function(b){
+      b.classList.remove('open');
+      var next=b.nextElementSibling;
+      if(next)next.classList.remove('open');
+    });
+  }
+}
 function toggleTheme(){
   const dark=document.documentElement.classList.toggle('gunmetal');
   document.documentElement.classList.toggle('navy',!dark);
@@ -124,6 +146,14 @@ def assemble(title_e, cat_e, toc_html, body):
         '<nav class="toc" id="toc">',
         '  <div class="toc-head">Contents</div>',
         f'  {toc_html}',
+        '  <div class="gswrap">',
+        '    <button class="gsw" id="gsw-src" onclick="toggleGlobal(\'src\')">',
+        '      <span class="gar">&#9658;</span> Source Code',
+        '    </button>',
+        '    <button class="gsw" id="gsw-out" onclick="toggleGlobal(\'out\')">',
+        '      <span class="gar">&#9658;</span> Output',
+        '    </button>',
+        '  </div>',
         '  <div class="tswrap">',
         '    <span>Navy</span>',
         '    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>',
