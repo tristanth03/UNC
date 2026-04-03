@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convergence of Fourier Series</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-theory" class="h2">2. Theory</a>
+  <a href="#2-1-definition" class="h3">2.1 Definition</a>
+  <a href="#2-2-convergence" class="h3">2.2 Convergence</a>
+  <a href="#2-2-1-l-2-convergence" class="h4">2.2.1 $L^2$ Convergence</a>
+  <a href="#2-2-2-pointwise-convergence" class="h4">2.2.2 Pointwise Convergence</a>
+  <a href="#2-2-2-1-gibbs-phenomenon" class="h5">2.2.2.1 Gibbs Phenomenon</a>
+  <a href="#3-numerical-experiment" class="h2">3. Numerical Experiment</a>
+  <a href="#3-1-setup" class="h3">3.1 Setup</a>
+  <a href="#3-2-decay-of-coefficients" class="h3">3.2 Decay of Coefficients</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Analysis Report</div>
+    <h1 class="rt">Convergence of Fourier Series</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>The Fourier series is a decomposition of a periodic function \(f : \mathbb{R} \to \mathbb{C}\) into a sum of sinusoids. It is one of the most powerfull tools in classical analysis.</p>
+
+<h2 class="stitle" id="2-theory">2. Theory</h2>
+
+<h3 class="sstitle" id="2-1-definition">2.1 Definition</h3>
+
+<span class="tag">Definition</span> <br>
+<p>Let \(f \in L^2([-\pi, \pi])\). The Fourier series of \(f\) is</p>
+\[f(x) \sim \sum_{n=-\infty}^{\infty} \hat{f}(n)\, e^{inx}\]
+<p>where the Fourier coefficients are given by</p>
+\[\hat{f}(n) = \frac{1}{2\pi} \int_{-\pi}^{\pi} f(x)\, e^{-inx}\, dx, \quad n \in \mathbb{Z}\]
+
+<h3 class="sstitle" id="2-2-convergence">2.2 Convergence</h3>
+
+<h4 class="ssstitle" id="2-2-1-l-2-convergence">2.2.1 $L^2$ Convergence</h4>
+
+<span class="tag">Theorem</span> <br>
+<p>For any \(f \in L^2([-\pi,\pi])\), the partial sums \(S_N f(x) = \sum_{|n| \leq N} \hat{f}(n) e^{inx}\) satisfy</p>
+\[\lim_{N \to \infty} \| S_N f - f \|_{L^2} = 0\]
+<p>and Parseval's identity holds:</p>
+\[\| f \|_{L^2}^2 = 2\pi \sum_{n=-\infty}^{\infty} |\hat{f}(n)|^2\]
+
+<h4 class="ssstitle" id="2-2-2-pointwise-convergence">2.2.2 Pointwise Convergence</h4>
+
+<span class="tag">Proposition</span> <br>
+<p>If \(f\) is continuously differentiable at \(x_0\), then \(S_N f(x_0) \to f(x_0)\) as \(N \to \infty\). More precisely, the Dirichlet kernel \(D_N\) satisfies</p>
+\[S_N f(x) = (f * D_N)(x) = \frac{1}{2\pi} \int_{-\pi}^{\pi} f(x - t)\, D_N(t)\, dt\]
+<p>where</p>
+\[D_N(t) = \sum_{n=-N}^{N} e^{int} = \frac{\sin\bigl((N + \tfrac{1}{2})t\bigr)}{\sin(t/2)}\]
+
+<h5 class="sssstitle" id="2-2-2-1-gibbs-phenomenon">2.2.2.1 Gibbs Phenomenon</h5>
+
+<span class="tag">Remark</span> <br>
+<p>At a jump discontinuity of \(f\), the partial sums overshoot by approximately \(9\%\) regardless of \(N\). Precisely, if \(f\) has a jump of size \(\delta = f(x_0^+) - f(x_0^-)\), then</p>
+\[\limsup_{N\to\infty} S_N f(x) \approx f(x_0^+) + 0.0895\, \delta\]
+
+<h2 class="stitle" id="3-numerical-experiment">3. Numerical Experiment</h2>
+
+<h3 class="sstitle" id="3-1-setup">3.1 Setup</h3>
+
+<h3 class="sstitle" id="3-2-decay-of-coefficients">3.2 Decay of Coefficients</h3>
+
+<span class="tag">Proposition</span> <br>
+<p>For the square wave \(f(x) = \mathrm{sgn}(x)\), the Fourier coefficients satisfy \(\hat{f}(n) = 0\) for even \(n\), and</p>
+\[\hat{f}(n) = \frac{2}{i\pi n}, \quad n \text{ odd}\]
+<p>so \(|\hat{f}(n)| = O(n^{-1})\), consistent with the \(C^0 \setminus C^1\) regularity of \(f\). In general, \(k\) derivatives in \(L^2\) implies \(|\hat{f}(n)| = O(n^{-k})\).</p>
+
+  <footer class="rf">
+    <div>Convergence of Fourier Series &mdash; Analysis Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>
