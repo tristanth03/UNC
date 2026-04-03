@@ -2,6 +2,7 @@
 converter.py — orchestrates parser, renderer, and template into a final HTML file
 """
 import html as htmllib, re
+from datetime import datetime
 from pathlib import Path
 
 from parser   import load_notebook, get_cells
@@ -61,12 +62,15 @@ def convert(nb_path: Path, out_path: Path):
     toc = TOC()
     body_parts = render_cells(cells, toc)
 
+    timestamp = datetime.now().strftime('(%H:%M) %d.%m.%Y')
+
     html = assemble(
-        title_e   = esc(title),
-        cat_e     = esc(category),
-        toc_html  = toc.render(),
-        body      = '\n'.join(body_parts),
+        title_e    = esc(title),
+        cat_e      = esc(category),
+        toc_html   = toc.render(),
+        body       = '\n'.join(body_parts),
         extra_head = _extra_head(nb),
+        timestamp  = timestamp,
     )
 
     with open(out_path, 'w', encoding='utf-8') as f:

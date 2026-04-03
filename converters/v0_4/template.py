@@ -149,7 +149,7 @@ GOOGLE_FONTS = (
 PLOTLY_HEAD = '<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.35.2/plotly.min.js"></script>'
 
 
-def assemble(title_e, cat_e, toc_html, body, extra_head=None):
+def assemble(title_e, cat_e, toc_html, body, extra_head=None, timestamp=''):
     lines = [
         '<!DOCTYPE html>',
         '<html lang="en" class="navy">',
@@ -190,6 +190,7 @@ def assemble(title_e, cat_e, toc_html, body, extra_head=None):
         body,
         '  <footer class="rf">',
         f'    <div>{title_e} &mdash; {cat_e} Report</div>',
+        f'    <div>Updated: {timestamp}</div>',
         '    <div id="theme-lbl">Navy Vault</div>',
         '  </footer>',
         '</main>',
