@@ -6,10 +6,12 @@ import json
 from pathlib import Path
 
 _MAP_PATH = Path(__file__).parent.parent.parent / 'theme' / 'font_mapping.json'
+_MAP_FALLBACK = Path(__file__).parent / 'font_mapping.json'
 
 
 def load_map():
-    with open(_MAP_PATH, encoding='utf-8') as f:
+    path = _MAP_PATH if _MAP_PATH.exists() else _MAP_FALLBACK
+    with open(path, encoding='utf-8') as f:
         return json.load(f)
 
 

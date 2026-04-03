@@ -71,7 +71,7 @@ class TOC:
     def render(self):
         lines = []
         for level, text, sid in self.entries:
-            cls = {2: 'h2', 3: 'h3', 4: 'h4'}.get(level, 'h3')
+            cls = {2: 'h2', 3: 'h3', 4: 'h4', 5: 'h5'}.get(level, 'h5')
             lines.append(f'<a href="#{sid}" class="{cls}">{esc(text)}</a>')
         return '\n  '.join(lines)
 
@@ -104,7 +104,7 @@ def render_markdown_cell(src, tags, toc):
         if level == 1:
             return ''   # title — handled in header
         sid = toc.add(level, text)
-        cls = {2: 'stitle', 3: 'sstitle', 4: 'ssstitle'}.get(min(level, 4), 'sstitle')
+        cls = {2: 'stitle', 3: 'sstitle', 4: 'ssstitle', 5: 'sssstitle'}.get(level, 'sssstitle')
         return f'<h{level} class="{cls}" id="{sid}">{esc(text)}</h{level}>\n'
     return render_tags(tags) + md_to_html(src) + '\n'
 
