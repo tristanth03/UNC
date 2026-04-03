@@ -68,9 +68,11 @@ html.show-src .ctog{display:flex;}
 html.show-out .otog{display:flex;}
 .ar{display:inline-block;transition:transform .18s;}
 .ctog.open .ar,.otog.open .ar{transform:rotate(90deg);}
-.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw{display:none;position:relative;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
 .cdraw.open{display:block;}
 pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.cpybtn{position:absolute;top:.4rem;right:.5rem;font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;color:var(--silver);background:none;border:1px solid var(--border);border-radius:3px;padding:1px 6px;cursor:pointer;transition:color .12s,border-color .12s;}
+.cpybtn:hover{color:var(--acc);border-color:var(--acc);}
 .rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
 .toc::-webkit-scrollbar{width:4px;}
 .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -165,7 +167,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.02);}
 <h3 class="sstitle" id="4-1-support-enumeration-for-2-2-games">4.1 Support Enumeration for 2×2 Games</h3>
 
 <button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
-<div class="cdraw" id="code-1"><pre>import numpy as np
+<div class="cdraw" id="code-1"><button class="cpybtn" onclick="cpy(this)">copy</button><pre>import numpy as np
 from itertools import product
 import matplotlib.pyplot as plt
 def find_nash_2x2(A, B):
@@ -211,14 +213,14 @@ print('Matching Pennies equilibria:')
 for s1, s2 in find_nash_2x2(A_mp, B_mp):
     print(f'  sigma1={s1}, sigma2={s2}')</pre></div>
 <button class="otog" onclick="tog('out-1',this)"><span class="ar">&#9658;</span> Output</button>
-<div class="cdraw" id="out-1"><div class="cell-out"><pre>Prisoner's Dilemma equilibria:
+<div class="cdraw" id="out-1"><button class="cpybtn" onclick="cpy(this)">copy</button><div class="cell-out"><pre>Prisoner's Dilemma equilibria:
   sigma1=[0. 1.], sigma2=[0. 1.]
 Matching Pennies equilibria:
   sigma1=[0.5 0.5], sigma2=[0.5 0.5]</pre></div></div>
 <h3 class="sstitle" id="4-2-best-response-correspondence">4.2 Best-Response Correspondence</h3>
 
 <button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
-<div class="cdraw" id="code-2"><pre># Visualise best-response correspondences for Matching Pennies
+<div class="cdraw" id="code-2"><button class="cpybtn" onclick="cpy(this)">copy</button><pre># Visualise best-response correspondences for Matching Pennies
 q_vals = np.linspace(0, 1, 300)
 
 # Row player's expected payoff from Heads minus Tails
@@ -251,6 +253,14 @@ plt.show()</pre></div>
 </div>
 <script>
 function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function cpy(btn){
+  var pre=btn.parentElement.querySelector('pre');
+  if(!pre)return;
+  navigator.clipboard.writeText(pre.textContent).then(function(){
+    btn.textContent='copied!';
+    setTimeout(function(){btn.textContent='copy';},1500);
+  });
+}
 function toggleGlobal(type){
   var cls=type==='src'?'show-src':'show-out';
   var btnCls=type==='src'?'.ctog':'.otog';
