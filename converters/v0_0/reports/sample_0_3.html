@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nash Equilibria and Strategic Interaction</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-normal-form-games" class="h2">2. Normal-Form Games</a>
+  <a href="#2-1-definition" class="h3">2.1 Definition</a>
+  <a href="#2-2-nash-equilibrium" class="h3">2.2 Nash Equilibrium</a>
+  <a href="#3-classic-examples" class="h2">3. Classic Examples</a>
+  <a href="#3-1-the-prisoner-s-dilemma" class="h3">3.1 The Prisoner's Dilemma</a>
+  <a href="#3-2-matching-pennies" class="h3">3.2 Matching Pennies</a>
+  <a href="#4-finding-equilibria-numerically" class="h2">4. Finding Equilibria Numerically</a>
+  <a href="#4-1-support-enumeration-for-2-2-games" class="h3">4.1 Support Enumeration for 2×2 Games</a>
+  <a href="#4-2-best-response-correspondence" class="h3">4.2 Best-Response Correspondence</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Economics Report</div>
+    <h1 class="rt">Nash Equilibria and Strategic Interaction</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>Game theory studies rational decision-making in settings where the outcome for each player depends on the choices of others. The central solution concept — the <strong>Nash equilibrium</strong> — formalises the intuition of a stable outcome: a profile of strategies from which no individual player has an incentive to deviate unilaterally.</p>
+
+<h2 class="stitle" id="2-normal-form-games">2. Normal-Form Games</h2>
+
+<h3 class="sstitle" id="2-1-definition">2.1 Definition</h3>
+
+<p>A finite normal-form game is a triple \(G = (N, S, u)\) where:
+- \(N = \{1, \ldots, n\}\) is the set of players
+- \(S = S_1 \times \cdots \times S_n\), with \(S_i\) the finite strategy set of player \(i\)
+- \(u = (u_1, \ldots, u_n)\), with \(u_i : S \to \mathbb{R}\) the payoff function of player \(i\)</p>
+<p>A <strong>mixed strategy</strong> for player \(i\) is a probability distribution \(\sigma_i \in \Delta(S_i)\). The expected payoff under a mixed profile \(\sigma = (\sigma_1, \ldots, \sigma_n)\) is</p>
+\[U_i(\sigma) = \sum_{s \in S} \left(\prod_{j=1}^n \sigma_j(s_j)\right) u_i(s)\]
+
+<h3 class="sstitle" id="2-2-nash-equilibrium">2.2 Nash Equilibrium</h3>
+
+<p>A mixed strategy profile \(\sigma^*\) is a <strong>Nash equilibrium</strong> if for every player \(i\) and every alternative strategy \(\sigma_i'\),</p>
+\[U_i(\sigma_i^*, \sigma_{-i}^*) \geq U_i(\sigma_i', \sigma_{-i}^*)\]
+<p>where \(\sigma_{-i}^*\) denotes the strategies of all players other than \(i\). Nash (1950) proved that every finite game has at least one Nash equilibrium in mixed strategies.</p>
+
+<h2 class="stitle" id="3-classic-examples">3. Classic Examples</h2>
+
+<h3 class="sstitle" id="3-1-the-prisoner-s-dilemma">3.1 The Prisoner's Dilemma</h3>
+
+<p>Two suspects are interrogated separately. Each can <strong>Cooperate</strong> (stay silent) or <strong>Defect</strong> (testify). The payoff matrix (row player's payoff, column player's payoff) is:</p>
+<div class="tbl-wrap"><table><thead><tr><th></th><th>Cooperate</th><th>Defect</th></tr></thead><tbody><tr><td><strong>Cooperate</strong></td><td>\((-1,\ -1)\)</td><td>\((-3,\ 0)\)</td></tr><tr><td><strong>Defect</strong></td><td>\((0,\ -3)\)</td><td>\((-2,\ -2)\)</td></tr></tbody></table></div>
+<p>Defect <strong>strictly dominates</strong> Cooperate for each player regardless of the other's choice. The unique Nash equilibrium is (Defect, Defect) with payoff \((-2, -2)\), even though (Cooperate, Cooperate) at \((-1,-1)\) is Pareto superior. This tension between individual rationality and collective welfare is the central insight of the dilemma.</p>
+
+<h3 class="sstitle" id="3-2-matching-pennies">3.2 Matching Pennies</h3>
+
+<p>Two players simultaneously show a penny — Heads or Tails. Player 1 wins \( \$1\) if the pennies match; Player 2 wins \(\$1\) if they differ.</p>
+<div class="tbl-wrap"><table><thead><tr><th></th><th>Heads</th><th>Tails</th></tr></thead><tbody><tr><td><strong>Heads</strong></td><td>\((1,\ -1)\)</td><td>\((-1,\ 1)\)</td></tr><tr><td><strong>Tails</strong></td><td>\((-1,\ 1)\)</td><td>\((1,\ -1)\)</td></tr></tbody></table></div>
+<p>There is no pure-strategy Nash equilibrium. The unique mixed-strategy equilibrium has each player randomise \(50/50\), giving expected payoff \(0\) to both. This is a <strong>zero-sum game</strong>: \(u_1(s) + u_2(s) = 0\) for all \(s\).</p>
+
+<h2 class="stitle" id="4-finding-equilibria-numerically">4. Finding Equilibria Numerically</h2>
+
+<h3 class="sstitle" id="4-1-support-enumeration-for-2-2-games">4.1 Support Enumeration for 2×2 Games</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import numpy as np
+from itertools import product
+
+def find_nash_2x2(A, B):
+    """
+    Find all Nash equilibria of a 2x2 bimatrix game.
+    A: payoff matrix for row player (2x2)
+    B: payoff matrix for column player (2x2)
+    Returns list of (sigma1, sigma2) equilibrium pairs.
+    """
+    equilibria = []
+
+    # Pure strategy equilibria
+    for i, j in product(range(2), range(2)):
+        row_dev = all(A[i, j] &gt;= A[k, j] for k in range(2))
+        col_dev = all(B[i, j] &gt;= B[i, k] for k in range(2))
+        if row_dev and col_dev:
+            s1 = np.array([1.0 if k == i else 0.0 for k in range(2)])
+            s2 = np.array([1.0 if k == j else 0.0 for k in range(2)])
+            equilibria.append((s1, s2))
+
+    # Mixed strategy equilibrium: row player mixes iff column is indifferent
+    # Solve B[0,:] @ q = B[1,:] @ q for q (column's mix)
+    dB = B[:, 0] - B[:, 1]
+    if dB[0] != dB[1]:
+        p = (B[1, 1] - B[0, 1]) / (B[0, 0] - B[1, 0] - B[0, 1] + B[1, 1]) if (B[0,0] - B[1,0] - B[0,1] + B[1,1]) != 0 else None
+        q = (A[1, 1] - A[1, 0]) / (A[0, 0] - A[0, 1] - A[1, 0] + A[1, 1]) if (A[0,0] - A[0,1] - A[1,0] + A[1,1]) != 0 else None
+        if p is not None and q is not None and 0 &lt; p &lt; 1 and 0 &lt; q &lt; 1:
+            equilibria.append((np.array([p, 1-p]), np.array([q, 1-q])))
+
+    return equilibria
+
+# Prisoner's Dilemma
+A_pd = np.array([[-1, -3], [0, -2]], dtype=float)
+B_pd = A_pd.T
+print('Prisoner\'s Dilemma equilibria:')
+for s1, s2 in find_nash_2x2(A_pd, B_pd):
+    print(f'  sigma1={s1}, sigma2={s2}')
+
+# Matching Pennies
+A_mp = np.array([[1, -1], [-1, 1]], dtype=float)
+B_mp = -A_mp
+print('Matching Pennies equilibria:')
+for s1, s2 in find_nash_2x2(A_mp, B_mp):
+    print(f'  sigma1={s1}, sigma2={s2}')</pre></div>
+<h3 class="sstitle" id="4-2-best-response-correspondence">4.2 Best-Response Correspondence</h3>
+
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre># Visualise best-response correspondences for Matching Pennies
+q_vals = np.linspace(0, 1, 300)
+
+# Row player's expected payoff from Heads minus Tails
+# EU1(H) - EU1(T) = q*(1) + (1-q)*(-1) - [q*(-1) + (1-q)*(1)] = 4q - 2
+# BR1: play H if q &gt; 0.5, T if q &lt; 0.5, any mix if q = 0.5
+br1_p = np.where(q_vals &gt; 0.5, 1.0, np.where(q_vals &lt; 0.5, 0.0, 0.5))
+
+p_vals = np.linspace(0, 1, 300)
+# Column player's EU from Heads minus Tails given row plays H with prob p
+# EU2(H) - EU2(T) = p*(-1) + (1-p)*(1) - [p*(1) + (1-p)*(-1)] = 2 - 4p
+# BR2: play H if p &lt; 0.5
+br2_q = np.where(p_vals &lt; 0.5, 1.0, np.where(p_vals &gt; 0.5, 0.0, 0.5))
+
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.plot(br1_p, q_vals, label='BR$_1$: row player', linewidth=2)
+ax.plot(p_vals, br2_q, label='BR$_2$: column player', linewidth=2, linestyle='--')
+ax.plot(0.5, 0.5, 'ko', markersize=8, label='Nash equilibrium $(\\frac{1}{2}, \\frac{1}{2})$')
+ax.set_xlabel('$p$ (prob. row plays Heads)')
+ax.set_ylabel('$q$ (prob. col plays Heads)')
+ax.set_title('Best-Response Correspondences: Matching Pennies')
+ax.legend()
+plt.tight_layout()
+plt.show()</pre></div>
+  <footer class="rf">
+    <div>Nash Equilibria and Strategic Interaction &mdash; Economics Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>

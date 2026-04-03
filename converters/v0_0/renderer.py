@@ -11,18 +11,74 @@ def esc(s):
 
 # ── Math ─────────────────────────────────────────────────────────────────────
 
+# Dollar signs must be matched with re.escape(chr(36)) to get a genuine
+# literal-dollar pattern.  Using \$ in a raw-string pattern produces the
+# two-char sequence \$ which some regex builds treat as backslash + EOL-anchor.
+
+_D  = re.escape(chr(36))                          # literal $  →  \$
+_DD = _D + _D                                      # literal $$ →  \$\$
+# Content: \$ (backslash+dollar) is treated as an escape unit so it does not
+# act as a closing delimiter. This handles LaTeX \$1 (literal dollar sign).
+_MATH_CONTENT = r'(?:\\' + _D + r'|[^' + _D + r'\n])+?'
+_INLINE_MATH  = re.compile(_D + r'(' + _MATH_CONTENT + r')' + _D)
+_DISPLAY_MATH = re.compile(_DD + r'\s*([\s\S]+?)\s*' + _DD)
+
+
 def convert_math(src):
     """$$...$$ → \\[...\\]   $...$ → \\(...\\)"""
-    src = re.sub(r'\$\$\s*([\s\S]+?)\s*\$\$', lambda m: r'\[' + m.group(1) + r'\]', src)
-    src = re.sub(r'\$([^\$\n]+?)\$',           lambda m: r'\(' + m.group(1) + r'\)', src)
+    src = _DISPLAY_MATH.sub(lambda m: r'\[' + m.group(1) + r'\]', src)
+    src = _INLINE_MATH.sub( lambda m: r'\(' + m.group(1) + r'\)', src)
     return src
+
+
+def strip_math(text):
+    """Remove $...$ and $$...$$ spans from text — used only for slug generation."""
+    text = _DISPLAY_MATH.sub('', text)
+    text = _INLINE_MATH.sub('', text)
+    return re.sub(r'\s+', ' ', text).strip()
 
 
 # ── Markdown prose ────────────────────────────────────────────────────────────
 
+def _is_table(lines):
+    """True if lines form a GFM pipe table (header | separator | rows...)."""
+    if len(lines) < 2:
+        return False
+    if not lines[0].strip().startswith('|'):
+        return False
+    return bool(re.match(r'^\|[\s|:-]+\|$', lines[1].strip()))
+
+
+def _render_table(lines):
+    """Convert GFM pipe-table lines to an HTML <table>."""
+    def split_row(line):
+        line = line.strip().strip('|')
+        return [c.strip() for c in line.split('|')]
+
+    def fmt_cell(c):
+        c = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', c)
+        c = re.sub(r'`([^`]+)`', r'<code>\1</code>', c)
+        c = _INLINE_MATH.sub(lambda m: r'\(' + m.group(1) + r'\)', c)
+        return c
+
+    header = split_row(lines[0])
+    body_rows = [split_row(l) for l in lines[2:]]
+    th = ''.join(f'<th>{fmt_cell(c)}</th>' for c in header)
+    rows = ''.join(
+        '<tr>' + ''.join(f'<td>{fmt_cell(c)}</td>' for c in row) + '</tr>'
+        for row in body_rows
+    )
+    return (
+        '<div class="tbl-wrap">'
+        f'<table><thead><tr>{th}</tr></thead><tbody>{rows}</tbody></table>'
+        '</div>'
+    )
+
+
 def md_to_html(src):
     """
     Minimal markdown:
+    - pipe tables → <table>
     - **bold**
     - `code`
     - math (via convert_math)
@@ -34,6 +90,29 @@ def md_to_html(src):
         s = re.sub(r'`([^`]+)`', r'<code>\1</code>', s)
         return s
 
+    # ── Pass 1: extract pipe-table blocks before any other processing ──
+    table_placeholder = {}
+    result_lines = []
+    raw_lines = src.split('\n')
+    i = 0
+    while i < len(raw_lines):
+        if raw_lines[i].strip().startswith('|'):
+            block = []
+            while i < len(raw_lines) and raw_lines[i].strip().startswith('|'):
+                block.append(raw_lines[i])
+                i += 1
+            if _is_table(block):
+                key = f'\x00TABLE{len(table_placeholder)}\x00'
+                table_placeholder[key] = _render_table(block)
+                result_lines.append(key)
+            else:
+                result_lines.extend(block)
+        else:
+            result_lines.append(raw_lines[i])
+            i += 1
+    src = '\n'.join(result_lines)
+
+    # ── Pass 2: math conversion + paragraph splitting ──
     src = convert_math(src)
     DISP = re.compile(r'(\\\[[\s\S]+?\\\])')
     parts = DISP.split(src)
@@ -46,9 +125,13 @@ def md_to_html(src):
             out.append(part)
         else:
             for p in re.split(r'\n{2,}', part):
-                p = fmt(p.strip())
-                if p:
-                    out.append(f'<p>{p}</p>')
+                p = p.strip()
+                if not p:
+                    continue
+                if p in table_placeholder:
+                    out.append(table_placeholder[p])
+                else:
+                    out.append(f'<p>{fmt(p)}</p>')
     return '\n'.join(out)
 
 
@@ -60,19 +143,21 @@ class TOC:
         self._counts = {}
 
     def add(self, level, text):
-        sid = re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
+        plain = strip_math(text)           # plain text used only for the slug
+        sid = re.sub(r'[^a-z0-9]+', '-', plain.lower()).strip('-')
         n = self._counts.get(sid, 0)
         self._counts[sid] = n + 1
         if n:
             sid = f'{sid}-{n}'
-        self.entries.append((level, text, sid))
+        label = convert_math(text)         # math converted for display in TOC
+        self.entries.append((level, label, sid))
         return sid
 
     def render(self):
         lines = []
-        for level, text, sid in self.entries:
+        for level, label, sid in self.entries:
             cls = {2: 'h2', 3: 'h3', 4: 'h4', 5: 'h5'}.get(level, 'h5')
-            lines.append(f'<a href="#{sid}" class="{cls}">{esc(text)}</a>')
+            lines.append(f'<a href="#{sid}" class="{cls}">{label}</a>')
         return '\n  '.join(lines)
 
 
@@ -105,7 +190,8 @@ def render_markdown_cell(src, tags, toc):
             return ''   # title — handled in header
         sid = toc.add(level, text)
         cls = {2: 'stitle', 3: 'sstitle', 4: 'ssstitle', 5: 'sssstitle'}.get(level, 'sssstitle')
-        return f'<h{level} class="{cls}" id="{sid}">{esc(text)}</h{level}>\n'
+        body = convert_math(text)          # math converted on raw text, no esc() first
+        return f'<h{level} class="{cls}" id="{sid}">{body}</h{level}>\n'
     return render_tags(tags) + md_to_html(src) + '\n'
 
 

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shannon Entropy and Information Theory</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-shannon-entropy" class="h2">2. Shannon Entropy</a>
+  <a href="#2-1-definition" class="h3">2.1 Definition</a>
+  <a href="#2-2-properties" class="h3">2.2 Properties</a>
+  <a href="#3-mutual-information-and-kl-divergence" class="h2">3. Mutual Information and KL Divergence</a>
+  <a href="#3-1-mutual-information" class="h3">3.1 Mutual Information</a>
+  <a href="#3-2-kl-divergence" class="h3">3.2 KL Divergence</a>
+  <a href="#4-source-coding" class="h2">4. Source Coding</a>
+  <a href="#4-1-shannon-s-source-coding-theorem" class="h3">4.1 Shannon's Source Coding Theorem</a>
+  <a href="#5-numerical-experiment" class="h2">5. Numerical Experiment</a>
+  <a href="#5-1-entropy-of-english-text" class="h3">5.1 Entropy of English Text</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Computer Science Report</div>
+    <h1 class="rt">Shannon Entropy and Information Theory</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>Claude Shannon's 1948 paper "A Mathematical Theory of Communication" founded information theory by giving a precise, quantitative definition of <strong>information</strong> and <strong>uncertainty</strong>. The resulting framework underpins everything from data compression and error-correcting codes to machine learning, cryptography, and neuroscience.</p>
+
+<h2 class="stitle" id="2-shannon-entropy">2. Shannon Entropy</h2>
+
+<h3 class="sstitle" id="2-1-definition">2.1 Definition</h3>
+
+<p>Let \(X\) be a discrete random variable taking values in a finite alphabet \(\mathcal{X}\) with probability mass function \(p(x) = P(X = x)\). The <strong>Shannon entropy</strong> of \(X\) is</p>
+\[H(X) = -\sum_{x \in \mathcal{X}} p(x) \log_2 p(x)\]
+<p>measured in <strong>bits</strong> (using \(\log_2\)). The convention \(0 \log_2 0 = 0\) applies. \(H(X)\) quantifies the average number of bits needed to describe the outcome of \(X\), or equivalently, our uncertainty about \(X\) before observing it.</p>
+
+<h3 class="sstitle" id="2-2-properties">2.2 Properties</h3>
+
+<p>- <strong>Non-negativity</strong>: \(H(X) \geq 0\), with equality iff \(X\) is deterministic.
+- <strong>Maximum entropy</strong>: \(H(X) \leq \log_2 |\mathcal{X}|\), with equality iff \(X\) is uniform.
+- <strong>Concavity</strong>: \(H\) is a concave function of \(p\).
+- <strong>Chain rule</strong>: \(H(X, Y) = H(X) + H(Y \mid X)\), where the conditional entropy is</p>
+\[H(Y \mid X) = -\sum_{x, y} p(x, y) \log_2 p(y \mid x)\]
+
+<h2 class="stitle" id="3-mutual-information-and-kl-divergence">3. Mutual Information and KL Divergence</h2>
+
+<h3 class="sstitle" id="3-1-mutual-information">3.1 Mutual Information</h3>
+
+<p>The <strong>mutual information</strong> \(I(X; Y)\) measures the reduction in uncertainty about \(X\) after observing \(Y\):</p>
+\[I(X; Y) = H(X) - H(X \mid Y) = \sum_{x,y} p(x,y) \log_2 \frac{p(x,y)}{p(x)\,p(y)}\]
+<p>\(I(X;Y) = 0\) iff \(X\) and \(Y\) are independent. It is symmetric: \(I(X;Y) = I(Y;X)\).</p>
+
+<h3 class="sstitle" id="3-2-kl-divergence">3.2 KL Divergence</h3>
+
+<p>The <strong>Kullback–Leibler divergence</strong> from distribution \(q\) to distribution \(p\) is</p>
+\[D_{\mathrm{KL}}(p \| q) = \sum_{x} p(x) \log_2 \frac{p(x)}{q(x)}\]
+<p>It satisfies \(D_{\mathrm{KL}}(p \| q) \geq 0\) with equality iff \(p = q\) (Gibbs' inequality), but it is <strong>not</strong> symmetric and not a metric. Mutual information can be written as \(I(X;Y) = D_{\mathrm{KL}}(p_{XY} \| p_X \otimes p_Y)\).</p>
+
+<h2 class="stitle" id="4-source-coding">4. Source Coding</h2>
+
+<h3 class="sstitle" id="4-1-shannon-s-source-coding-theorem">4.1 Shannon's Source Coding Theorem</h3>
+
+<p>For an i.i.d. source with entropy \(H(X)\) bits per symbol, the minimum average code length \(\bar{L}\) of any uniquely decodable code satisfies</p>
+\[H(X) \leq \bar{L} < H(X) + 1\]
+<p>This bound is achieved asymptotically by Huffman coding (for a single symbol) and arithmetic coding (for long sequences). No lossless compression can do better than \(H(X)\) bits per source symbol.</p>
+
+<h2 class="stitle" id="5-numerical-experiment">5. Numerical Experiment</h2>
+
+<h3 class="sstitle" id="5-1-entropy-of-english-text">5.1 Entropy of English Text</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import numpy as np
+import matplotlib.pyplot as plt
+from collections import Counter
+
+def entropy_bits(counts):
+    total = sum(counts.values())
+    probs = np.array([v / total for v in counts.values()])
+    probs = probs[probs &gt; 0]
+    return -np.sum(probs * np.log2(probs))
+
+# Approximate letter frequencies for English (relative)
+english_freq = {
+    'e': 12.70, 't': 9.06, 'a': 8.17, 'o': 7.51, 'i': 6.97, 'n': 6.75,
+    's': 6.33, 'h': 6.09, 'r': 5.99, 'd': 4.25, 'l': 4.03, 'c': 2.78,
+    'u': 2.76, 'm': 2.41, 'w': 2.36, 'f': 2.23, 'g': 2.02, 'y': 1.97,
+    'p': 1.93, 'b': 1.49, 'v': 0.98, 'k': 0.77, 'j': 0.15, 'x': 0.15,
+    'q': 0.10, 'z': 0.07
+}
+
+H_english = entropy_bits(english_freq)
+H_uniform = np.log2(26)
+
+print(f'Entropy of English letter distribution: {H_english:.4f} bits')
+print(f'Entropy of uniform distribution over 26 letters: {H_uniform:.4f} bits')
+print(f'Redundancy: {(1 - H_english / H_uniform) * 100:.1f}%')</pre></div>
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre># Plot entropy of a binary source as a function of p
+p_vals = np.linspace(1e-6, 1 - 1e-6, 1000)
+H_binary = -(p_vals * np.log2(p_vals) + (1 - p_vals) * np.log2(1 - p_vals))
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+
+axes[0].plot(p_vals, H_binary, linewidth=2, color='steelblue')
+axes[0].axvline(0.5, color='gray', linestyle='--', label='$p=0.5$, $H=1$ bit')
+axes[0].set_xlabel('$p$')
+axes[0].set_ylabel('$H(p)$ (bits)')
+axes[0].set_title('Binary Entropy Function')
+axes[0].legend()
+
+letters = list(english_freq.keys())
+freqs = list(english_freq.values())
+axes[1].bar(letters, freqs, color='steelblue', alpha=0.8)
+axes[1].set_xlabel('Letter')
+axes[1].set_ylabel('Frequency (%)')
+axes[1].set_title(f'English Letter Frequencies  ($H = {H_english:.2f}$ bits)')
+
+plt.tight_layout()
+plt.show()</pre></div>
+  <footer class="rf">
+    <div>Shannon Entropy and Information Theory &mdash; Computer Science Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>

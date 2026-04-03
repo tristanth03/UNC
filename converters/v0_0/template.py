@@ -47,6 +47,11 @@ pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color
 .rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
 .toc::-webkit-scrollbar{width:4px;}
 .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
 """
 
 # ── JS ────────────────────────────────────────────────────────────────────────

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The RSA Cryptosystem</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-mathematical-foundations" class="h2">2. Mathematical Foundations</a>
+  <a href="#2-1-euler-s-theorem" class="h3">2.1 Euler's Theorem</a>
+  <a href="#2-2-key-generation" class="h3">2.2 Key Generation</a>
+  <a href="#2-3-encryption-and-decryption" class="h3">2.3 Encryption and Decryption</a>
+  <a href="#3-security-considerations" class="h2">3. Security Considerations</a>
+  <a href="#3-1-key-size" class="h3">3.1 Key Size</a>
+  <a href="#3-2-common-pitfalls" class="h3">3.2 Common Pitfalls</a>
+  <a href="#4-numerical-demonstration" class="h2">4. Numerical Demonstration</a>
+  <a href="#4-1-toy-rsa-implementation" class="h3">4.1 Toy RSA Implementation</a>
+  <a href="#4-2-gnfs-security-estimate-vs-key-size" class="h3">4.2 GNFS Security Estimate vs. Key Size</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Computer Science Report</div>
+    <h1 class="rt">The RSA Cryptosystem</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>RSA (Rivest–Shamir–Adleman, 1977) was the first practical public-key cryptosystem. Its security rests on the <strong>integer factorisation problem</strong>: given a large composite number \(n = pq\), recovering \(p\) and \(q\) is computationally infeasible for suitably large primes. RSA underpins TLS/HTTPS, SSH, and digital signatures across the internet.</p>
+
+<h2 class="stitle" id="2-mathematical-foundations">2. Mathematical Foundations</h2>
+
+<h3 class="sstitle" id="2-1-euler-s-theorem">2.1 Euler's Theorem</h3>
+
+<p>For integers \(a\) and \(n\) with \(\gcd(a, n) = 1\), Euler's theorem states</p>
+\[a^{\phi(n)} \equiv 1 \pmod{n}\]
+<p>where \(\phi(n)\) is Euler's totient function. For \(n = pq\) with distinct primes \(p, q\):</p>
+\[\phi(n) = (p-1)(q-1)\]
+<p>This identity is the cornerstone of RSA correctness.</p>
+
+<h3 class="sstitle" id="2-2-key-generation">2.2 Key Generation</h3>
+
+<p>1. Choose two large distinct primes \(p\) and \(q\). Set \(n = pq\).
+2. Compute \(\phi(n) = (p-1)(q-1)\).
+3. Choose \(e\) with \(1 < e < \phi(n)\) and \(\gcd(e, \phi(n)) = 1\). Common choice: \(e = 65537 = 2^{16} + 1\).
+4. Compute \(d \equiv e^{-1} \pmod{\phi(n)}\) via the extended Euclidean algorithm.
+5. <strong>Public key</strong>: \((n, e)\). <strong>Private key</strong>: \((n, d)\).</p>
+
+<h3 class="sstitle" id="2-3-encryption-and-decryption">2.3 Encryption and Decryption</h3>
+
+<p>For a message \(m\) with \(0 < m < n\):</p>
+\[\text{Encrypt:} \quad c \equiv m^e \pmod{n}\]
+\[\text{Decrypt:} \quad m \equiv c^d \pmod{n}\]
+<p><strong>Correctness</strong>: Since \(ed \equiv 1 \pmod{\phi(n)}\), there exists \(k\) such that \(ed = 1 + k\phi(n)\), and by Euler's theorem</p>
+\[c^d = m^{ed} = m^{1 + k\phi(n)} = m \cdot (m^{\phi(n)})^k \equiv m \cdot 1^k = m \pmod{n}\]
+
+<h2 class="stitle" id="3-security-considerations">3. Security Considerations</h2>
+
+<h3 class="sstitle" id="3-1-key-size">3.1 Key Size</h3>
+
+<p>The best known algorithm for factoring a \(k\)-bit integer is the <strong>General Number Field Sieve</strong> (GNFS), with sub-exponential running time</p>
+\[\exp\!\left(\left(\frac{64}{9}\right)^{1/3} (\ln n)^{1/3} (\ln \ln n)^{2/3}\right)\]
+<p>NIST recommends \(n \geq 2048\) bits for security beyond 2030, corresponding to roughly \(112\) bits of symmetric-equivalent security. A \(4096\)-bit key gives \(\approx 140\) bits of security.</p>
+
+<h3 class="sstitle" id="3-2-common-pitfalls">3.2 Common Pitfalls</h3>
+
+<p>- <strong>Small \(e\) with small \(m\)</strong>: if \(m^e < n\), the modular reduction never activates and \(m = c^{1/e}\) over the integers.
+- <strong>Common modulus attack</strong>: if two users share \(n\) but use coprime exponents \(e_1, e_2\), Bezout's identity yields \(m\) from \(c_1, c_2\).
+- <strong>No padding</strong>: textbook RSA is deterministic and malleable. In practice, <strong>OAEP</strong> (Optimal Asymmetric Encryption Padding) is mandatory.
+- <strong>Quantum threat</strong>: Shor's algorithm factors \(n\) in polynomial time on a quantum computer, breaking RSA entirely.</p>
+
+<h2 class="stitle" id="4-numerical-demonstration">4. Numerical Demonstration</h2>
+
+<h3 class="sstitle" id="4-1-toy-rsa-implementation">4.1 Toy RSA Implementation</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import math
+import random
+
+def extended_gcd(a, b):
+    if b == 0:
+        return a, 1, 0
+    g, x, y = extended_gcd(b, a % b)
+    return g, y, x - (a // b) * y
+
+def mod_inverse(e, phi):
+    g, x, _ = extended_gcd(e, phi)
+    if g != 1:
+        raise ValueError('Inverse does not exist')
+    return x % phi
+
+def is_prime(n, k=20):
+    """Miller-Rabin primality test."""
+    if n &lt; 2: return False
+    if n == 2: return True
+    if n % 2 == 0: return False
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1; d //= 2
+    for _ in range(k):
+        a = random.randrange(2, n - 1)
+        x = pow(a, d, n)
+        if x in (1, n - 1): continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1: break
+        else:
+            return False
+    return True
+
+# Small primes for demonstration only
+p, q = 61, 53
+n = p * q
+phi_n = (p - 1) * (q - 1)
+e = 17
+d = mod_inverse(e, phi_n)
+
+print(f'n = {n},  phi(n) = {phi_n}')
+print(f'Public key:  (n={n}, e={e})')
+print(f'Private key: (n={n}, d={d})')
+
+message = 42
+ciphertext = pow(message, e, n)
+decrypted  = pow(ciphertext, d, n)
+print(f'\nMessage:    {message}')
+print(f'Ciphertext: {ciphertext}')
+print(f'Decrypted:  {decrypted}')</pre></div>
+<h3 class="sstitle" id="4-2-gnfs-security-estimate-vs-key-size">4.2 GNFS Security Estimate vs. Key Size</h3>
+
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre>import numpy as np
+import matplotlib.pyplot as plt
+
+bits = np.linspace(512, 8192, 500)
+ln2 = np.log(2)
+
+# GNFS complexity ~ exp((64/9)^(1/3) * (k*ln2)^(1/3) * (k*ln2*ln(k*ln2))^(2/3) )
+# Equivalent symmetric security in bits ~ log2 of complexity
+def gnfs_security(k):
+    ln_n = k * ln2
+    exponent = (64/9)**(1/3) * ln_n**(1/3) * (np.log(ln_n))**(2/3)
+    return exponent / ln2  # bits of security
+
+sec = gnfs_security(bits)
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(bits, sec, linewidth=2)
+ax.axhline(112, color='orange', linestyle='--', label='112-bit security (NIST 2030+)')
+ax.axhline(128, color='green',  linestyle='--', label='128-bit security')
+ax.axvline(2048, color='orange', linestyle=':')
+ax.axvline(3072, color='green',  linestyle=':')
+ax.set_xlabel('RSA key size (bits)')
+ax.set_ylabel('Equivalent symmetric security (bits)')
+ax.set_title('RSA Security vs. Key Size (GNFS estimate)')
+ax.legend()
+plt.tight_layout()
+plt.show()</pre></div>
+  <footer class="rf">
+    <div>The RSA Cryptosystem &mdash; Computer Science Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The SIR Epidemic Model</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-model-formulation" class="h2">2. Model Formulation</a>
+  <a href="#2-1-equations" class="h3">2.1 Equations</a>
+  <a href="#2-2-the-basic-reproduction-number" class="h3">2.2 The Basic Reproduction Number</a>
+  <a href="#2-3-final-epidemic-size" class="h3">2.3 Final Epidemic Size</a>
+  <a href="#3-numerical-simulation" class="h2">3. Numerical Simulation</a>
+  <a href="#3-1-epidemic-curves-for-various" class="h3">3.1 Epidemic Curves for Various \(\mathcal{R}_0\)</a>
+  <a href="#3-2-effect-of-vaccination" class="h3">3.2 Effect of Vaccination</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Biology Report</div>
+    <h1 class="rt">The SIR Epidemic Model</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>The SIR model, introduced by Kermack and McKendrick in 1927, is the foundational compartmental model in mathematical epidemiology. It partitions a population into three groups — <strong>Susceptible</strong>, <strong>Infectious</strong>, and <strong>Recovered</strong> — and uses a system of ODEs to describe the flow between them. Despite its simplicity, it captures the essential dynamics of epidemic waves and gives rise to one of the most influential concepts in public health: the <strong>basic reproduction number</strong> \(\mathcal{R}_0\).</p>
+
+<h2 class="stitle" id="2-model-formulation">2. Model Formulation</h2>
+
+<h3 class="sstitle" id="2-1-equations">2.1 Equations</h3>
+
+<p>Let \(S(t)\), \(I(t)\), \(R(t)\) be the fractions of the population in each compartment, so \(S + I + R = 1\). The dynamics are</p>
+\[\frac{dS}{dt} = -\beta S I\]
+\[\frac{dI}{dt} = \beta S I - \gamma I\]
+\[\frac{dR}{dt} = \gamma I\]
+<p>where \(\beta\) is the transmission rate (contacts per unit time \(\times\) probability of transmission per contact) and \(\gamma = 1/D\) is the recovery rate, with \(D\) the mean infectious period.</p>
+
+<h3 class="sstitle" id="2-2-the-basic-reproduction-number">2.2 The Basic Reproduction Number</h3>
+
+<p>The <strong>basic reproduction number</strong> is</p>
+\[\mathcal{R}_0 = \frac{\beta}{\gamma}\]
+<p>It represents the average number of secondary infections produced by one infectious individual in a fully susceptible population. The <strong>epidemic threshold theorem</strong> states:
+- If \(\mathcal{R}_0 > 1\): the infection spreads (\(dI/dt > 0\) initially when \(S \approx 1\))
+- If \(\mathcal{R}_0 \leq 1\): the infection dies out</p>
+<p>The epidemic peaks when \(S = 1/\mathcal{R}_0\), and the <strong>herd immunity threshold</strong> is \(1 - 1/\mathcal{R}_0\).</p>
+
+<h3 class="sstitle" id="2-3-final-epidemic-size">2.3 Final Epidemic Size</h3>
+
+<p>The total fraction of the population ultimately infected, \(R_\infty\), satisfies the transcendental equation</p>
+\[R_\infty = 1 - e^{-\mathcal{R}_0\, R_\infty}\]
+<p>This has no closed form but is easily solved numerically. For \(\mathcal{R}_0 = 2.5\) (roughly measles before vaccination), \(R_\infty \approx 0.893\) — nearly \(90\%\) of the population.</p>
+
+<h2 class="stitle" id="3-numerical-simulation">3. Numerical Simulation</h2>
+
+<h3 class="sstitle" id="3-1-epidemic-curves-for-various">3.1 Epidemic Curves for Various \(\mathcal{R}_0\)</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+from scipy.optimize import brentq
+
+def sir(t, y, beta, gamma):
+    S, I, R = y
+    return [-beta*S*I, beta*S*I - gamma*I, gamma*I]
+
+gamma = 1/10  # 10-day infectious period
+R0_values = [1.5, 2.0, 2.5, 3.5]
+I0 = 1e-4
+t_span = (0, 300)
+t_eval = np.linspace(*t_span, 3000)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+for R0 in R0_values:
+    beta = R0 * gamma
+    sol = solve_ivp(sir, t_span, [1 - I0, I0, 0], args=(beta, gamma),
+                    t_eval=t_eval, rtol=1e-9)
+    axes[0].plot(sol.t, sol.y[1] * 100, label=f'$\\mathcal{{R}}_0 = {R0}$', linewidth=2)
+
+axes[0].set_xlabel('Days')
+axes[0].set_ylabel('Infectious (% of population)')
+axes[0].set_title('SIR Epidemic Curves')
+axes[0].legend()
+
+# Final epidemic size vs R0
+R0_range = np.linspace(1.01, 5.0, 300)
+R_inf = []
+for R0 in R0_range:
+    f = lambda x: x - 1 + np.exp(-R0 * x)
+    R_inf.append(brentq(f, 1e-9, 1 - 1e-9))
+
+axes[1].plot(R0_range, np.array(R_inf) * 100, linewidth=2, color='crimson')
+axes[1].axvline(1, color='gray', linestyle='--', label='$\\mathcal{R}_0 = 1$ threshold')
+for R0 in R0_values:
+    f = lambda x: x - 1 + np.exp(-R0 * x)
+    axes[1].plot(R0, brentq(f, 1e-9, 0.9999)*100, 'ko', markersize=5)
+axes[1].set_xlabel('$\\mathcal{R}_0$')
+axes[1].set_ylabel('Final epidemic size (% infected)')
+axes[1].set_title('Final Epidemic Size vs. $\\mathcal{R}_0$')
+axes[1].legend()
+
+plt.tight_layout()
+plt.show()</pre></div>
+<h3 class="sstitle" id="3-2-effect-of-vaccination">3.2 Effect of Vaccination</h3>
+
+<p>Vaccination reduces the effective susceptible fraction at \(t=0\). If a fraction \(v\) is vaccinated before the epidemic, the <strong>effective reproduction number</strong> is \(\mathcal{R}_{\text{eff}} = \mathcal{R}_0 (1 - v)\). The epidemic is suppressed when \(v \geq 1 - 1/\mathcal{R}_0\).</p>
+
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre>R0 = 2.5
+beta = R0 * gamma
+vax_levels = [0.0, 0.2, 0.4, 1 - 1/R0, 0.7]
+
+fig, ax = plt.subplots(figsize=(9, 4))
+for v in vax_levels:
+    S0 = (1 - v) - I0
+    sol = solve_ivp(sir, t_span, [S0, I0, v], args=(beta, gamma),
+                    t_eval=t_eval, rtol=1e-9)
+    label = f'$v = {v:.0%}$' if v != 1 - 1/R0 else f'$v = {v:.1%}$ (herd immunity threshold)'
+    ax.plot(sol.t, sol.y[1] * 100, label=label, linewidth=2)
+
+ax.set_xlabel('Days')
+ax.set_ylabel('Infectious (% of population)')
+ax.set_title(f'SIR with Vaccination ($\\mathcal{{R}}_0 = {R0}$)')
+ax.legend(fontsize=8)
+plt.tight_layout()
+plt.show()</pre></div>
+  <footer class="rf">
+    <div>The SIR Epidemic Model &mdash; Biology Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>

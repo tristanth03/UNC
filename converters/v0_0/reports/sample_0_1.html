@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Laplace Transform</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-definition-and-basic-properties" class="h2">2. Definition and Basic Properties</a>
+  <a href="#2-1-definition" class="h3">2.1 Definition</a>
+  <a href="#2-2-region-of-convergence" class="h3">2.2 Region of Convergence</a>
+  <a href="#2-3-elementary-transforms" class="h3">2.3 Elementary Transforms</a>
+  <a href="#3-operational-properties" class="h2">3. Operational Properties</a>
+  <a href="#3-1-linearity" class="h3">3.1 Linearity</a>
+  <a href="#3-2-differentiation-in" class="h3">3.2 Differentiation in \(t\)</a>
+  <a href="#3-3-convolution-theorem" class="h3">3.3 Convolution Theorem</a>
+  <a href="#4-inversion" class="h2">4. Inversion</a>
+  <a href="#4-1-bromwich-integral" class="h3">4.1 Bromwich Integral</a>
+  <a href="#4-2-partial-fraction-decomposition" class="h3">4.2 Partial Fraction Decomposition</a>
+  <a href="#5-numerical-experiment" class="h2">5. Numerical Experiment</a>
+  <a href="#5-1-setup" class="h3">5.1 Setup</a>
+  <a href="#5-2-exponential-decay" class="h3">5.2 Exponential Decay</a>
+  <a href="#5-3-inversion-via-stehfest-algorithm" class="h3">5.3 Inversion via Stehfest Algorithm</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Analysis Report</div>
+    <h1 class="rt">The Laplace Transform</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>The Laplace transform is an integral transform that converts a function of a real variable \(t \geq 0\) into a function of a complex variable \(s\). It is one of the central tools in the analysis of linear differential equations and dynamical systems, and bears a deep structural relationship to the Fourier transform.</p>
+
+<h2 class="stitle" id="2-definition-and-basic-properties">2. Definition and Basic Properties</h2>
+
+<h3 class="sstitle" id="2-1-definition">2.1 Definition</h3>
+
+<p>Let \(f : [0, \infty) \to \mathbb{C}\) be a locally integrable function. The <strong>Laplace transform</strong> of \(f\) is defined by</p>
+\[\mathcal{L}\{f\}(s) = F(s) = \int_0^{\infty} f(t)\, e^{-st}\, dt\]
+<p>for all \(s \in \mathbb{C}\) for which the integral converges absolutely. The variable \(s = \sigma + i\omega\) is complex, with \(\sigma = \operatorname{Re}(s)\).</p>
+
+<h3 class="sstitle" id="2-2-region-of-convergence">2.2 Region of Convergence</h3>
+
+<p>If \(f\) is of <strong>exponential order</strong> \(\alpha\), meaning there exist constants \(M, T > 0\) such that \(|f(t)| \leq M e^{\alpha t}\) for all \(t > T\), then \(F(s)\) converges absolutely for all \(s\) with \(\operatorname{Re}(s) > \alpha\). The <strong>abscissa of convergence</strong> is</p>
+\[\sigma_c = \inf \bigl\{ \sigma \in \mathbb{R} : F(\sigma + i\omega) \text{ converges for all } \omega \bigr\}\]
+<p>and \(F\) is analytic on the half-plane \(\{\operatorname{Re}(s) > \sigma_c\}\).</p>
+
+<h3 class="sstitle" id="2-3-elementary-transforms">2.3 Elementary Transforms</h3>
+
+<p>The following table collects the most frequently used pairs. Throughout, \(n \in \mathbb{N}\), \(a \in \mathbb{C}\), and all transforms hold for \(\operatorname{Re}(s)\) sufficiently large.</p>
+<div class="tbl-wrap"><table><thead><tr><th>\(f(t)\)</th><th>\(F(s)\)</th></tr></thead><tbody><tr><td>\(1\)</td><td>\(\dfrac{1}{s}\)</td></tr><tr><td>\(e^{at}\)</td><td>\(\dfrac{1}{s - a}\)</td></tr><tr><td>\(t^n\)</td><td>\(\dfrac{n!}{s^{n+1}}\)</td></tr><tr><td>\(\sin(\omega t)\)</td><td>\(\dfrac{\omega}{s^2 + \omega^2}\)</td></tr><tr><td>\(\cos(\omega t)\)</td><td>\(\dfrac{s}{s^2 + \omega^2}\)</td></tr></tbody></table></div>
+
+<h2 class="stitle" id="3-operational-properties">3. Operational Properties</h2>
+
+<h3 class="sstitle" id="3-1-linearity">3.1 Linearity</h3>
+
+<p>For \(\alpha, \beta \in \mathbb{C}\) and functions \(f, g\) of exponential order,</p>
+\[\mathcal{L}\{\alpha f + \beta g\}(s) = \alpha F(s) + \beta G(s)\]
+<p>This follows directly from linearity of the integral.</p>
+
+<h3 class="sstitle" id="3-2-differentiation-in">3.2 Differentiation in \(t\)</h3>
+
+<p>If \(f\) is absolutely continuous and \(f' \in L^1_{\mathrm{loc}}\), integration by parts gives</p>
+\[\mathcal{L}\{f'\}(s) = s F(s) - f(0^+)\]
+<p>Applying this inductively,</p>
+\[\mathcal{L}\{f^{(n)}\}(s) = s^n F(s) - \sum_{k=0}^{n-1} s^{n-1-k}\, f^{(k)}(0^+)\]
+<p>This formula is the principal reason the Laplace transform converts constant-coefficient ODEs into algebraic equations in \(s\).</p>
+
+<h3 class="sstitle" id="3-3-convolution-theorem">3.3 Convolution Theorem</h3>
+
+<p>The one-sided convolution of \(f\) and \(g\) is</p>
+\[(f * g)(t) = \int_0^t f(\tau)\, g(t - \tau)\, d\tau\]
+<p>The convolution theorem states</p>
+\[\mathcal{L}\{f * g\}(s) = F(s)\, G(s)\]
+<p>so convolution in the time domain corresponds to pointwise multiplication in the \(s\)-domain.</p>
+
+<h2 class="stitle" id="4-inversion">4. Inversion</h2>
+
+<h3 class="sstitle" id="4-1-bromwich-integral">4.1 Bromwich Integral</h3>
+
+<p>Under suitable conditions, the inverse Laplace transform is given by the <strong>Bromwich integral</strong> (a contour integral along a vertical line in the complex plane),</p>
+\[f(t) = \mathcal{L}^{-1}\{F\}(t) = \frac{1}{2\pi i} \lim_{T \to \infty} \int_{\sigma - iT}^{\sigma + iT} F(s)\, e^{st}\, ds\]
+<p>where \(\sigma > \sigma_c\). In practice, the integral is evaluated by closing the contour in the left half-plane and applying the <strong>residue theorem</strong>:</p>
+\[f(t) = \sum_{k} \operatorname{Res}_{s = s_k} \bigl[ F(s)\, e^{st} \bigr]\]
+<p>where the sum runs over all poles \(s_k\) of \(F\).</p>
+
+<h3 class="sstitle" id="4-2-partial-fraction-decomposition">4.2 Partial Fraction Decomposition</h3>
+
+<p>When \(F(s) = P(s)/Q(s)\) is rational with \(\deg P < \deg Q\) and \(Q\) has simple roots \(s_1, \ldots, s_m\), the decomposition</p>
+\[F(s) = \sum_{k=1}^{m} \frac{A_k}{s - s_k}, \qquad A_k = \lim_{s \to s_k} (s - s_k)\, F(s)\]
+<p>yields immediately</p>
+\[f(t) = \sum_{k=1}^{m} A_k\, e^{s_k t}\]
+<p>For a repeated pole of order \(r\) at \(s_0\), the contribution is \(\displaystyle\sum_{j=0}^{r-1} \frac{B_j}{j!}\, t^j e^{s_0 t}\).</p>
+
+<h2 class="stitle" id="5-numerical-experiment">5. Numerical Experiment</h2>
+
+<h3 class="sstitle" id="5-1-setup">5.1 Setup</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import quad
+
+# Numerical Laplace transform via direct quadrature
+def laplace_numerical(f, s, T=40.0):
+    real_part, _ = quad(lambda t: np.real(f(t) * np.exp(-s * t)), 0, T)
+    imag_part, _ = quad(lambda t: np.imag(f(t) * np.exp(-s * t)), 0, T)
+    return complex(real_part, imag_part)
+
+# Stehfest algorithm for numerical inversion
+def stehfest_inversion(F, t, N=16):
+    ln2_t = np.log(2) / t
+    n = N // 2
+    V = np.zeros(N)
+    for i in range(1, N + 1):
+        for k in range(int((i + 1) / 2), min(i, n) + 1):
+            V[i-1] += (k**n * np.math.factorial(2*k) /
+                       (np.math.factorial(n - k) * np.math.factorial(k) *
+                        np.math.factorial(k - 1) * np.math.factorial(i - k) *
+                        np.math.factorial(2*k - i)))
+        V[i-1] *= (-1)**(i + n)
+    return ln2_t * sum(V[i-1] * F(ln2_t * i) for i in range(1, N + 1))</pre></div>
+<h3 class="sstitle" id="5-2-exponential-decay">5.2 Exponential Decay</h3>
+
+<p>Consider \(f(t) = e^{-at}\) for \(a > 0\). The exact transform is \(F(s) = (s+a)^{-1}\) for \(\operatorname{Re}(s) > -a\). We verify numerically that the magnitude \(|F(\sigma + i\omega)|\) decays as \(\omega \to \infty\) along the line \(\sigma = 1\):</p>
+\[|F(1 + i\omega)| = \frac{1}{\sqrt{(1+a)^2 + \omega^2}} \sim \frac{1}{|\omega|} \quad \text{as } |\omega| \to \infty\]
+<p>This \(O(|\omega|^{-1})\) decay reflects the \(C^\infty\) regularity of \(f\) on \((0,\infty)\) and the single simple pole at \(s = -a\).</p>
+
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre>a = 2.0
+f = lambda t: np.exp(-a * t)
+F_exact = lambda s: 1.0 / (s + a)
+
+omega = np.linspace(0.5, 30, 500)
+sigma = 1.0
+
+F_num = np.array([abs(laplace_numerical(f, sigma + 1j*w)) for w in omega])
+F_ana = np.array([abs(F_exact(sigma + 1j*w)) for w in omega])
+
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.loglog(omega, F_ana, label=r'$|F(1+i\omega)|$ exact', linewidth=2)
+ax.loglog(omega, F_num, '--', label='numerical quadrature', linewidth=1.5)
+ax.loglog(omega, 1/omega, ':', label=r'$O(\omega^{-1})$', color='gray')
+ax.set_xlabel(r'$\omega$')
+ax.set_ylabel(r'$|F(1+i\omega)|$')
+ax.set_title('Decay of the Laplace Transform along $\\sigma = 1$')
+ax.legend()
+plt.tight_layout()
+plt.show()</pre></div>
+<h3 class="sstitle" id="5-3-inversion-via-stehfest-algorithm">5.3 Inversion via Stehfest Algorithm</h3>
+
+<p>The Stehfest algorithm approximates the Bromwich integral using \(N\) real evaluations of \(F\) on the positive real axis. For \(f(t) = e^{-at}\), we expect pointwise recovery. The error at time \(t\) satisfies</p>
+\[\bigl| \hat{f}_N(t) - f(t) \bigr| \to 0 \quad \text{as } N \to \infty\]
+<p>provided \(f\) is smooth, with convergence rate governed by the smoothness of \(f\) and the choice of \(N\).</p>
+
+<button class="ctog" onclick="tog('code-3',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-3"><pre>t_vals = np.linspace(0.05, 4.0, 200)
+f_exact = np.exp(-a * t_vals)
+f_stehfest = np.array([stehfest_inversion(F_exact, t) for t in t_vals])
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+
+axes[0].plot(t_vals, f_exact, label='$e^{-2t}$', linewidth=2)
+axes[0].plot(t_vals, f_stehfest, '--', label='Stehfest ($N=16$)', linewidth=1.5)
+axes[0].set_xlabel('$t$')
+axes[0].set_ylabel('$f(t)$')
+axes[0].set_title('Inversion: exact vs. Stehfest')
+axes[0].legend()
+
+axes[1].semilogy(t_vals, np.abs(f_stehfest - f_exact) + 1e-16)
+axes[1].set_xlabel('$t$')
+axes[1].set_ylabel('absolute error')
+axes[1].set_title('Pointwise inversion error')
+
+plt.tight_layout()
+plt.show()</pre></div>
+  <footer class="rf">
+    <div>The Laplace Transform &mdash; Analysis Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" class="navy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chemistry of Coffee</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[
+    {left:'\\[',right:'\\]',display:true},
+    {left:'\\(',right:'\\)',display:false}
+  ],throwOnError:false});"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root.navy {
+  --bg:#f2f4f6; --surface:#f2f4f6; --border:#D8E4EC;
+  --text:#060F22; --sub:#3a5060; --acc:#0E6090; --silver:#A8B8C8;
+  --grid:rgba(6,15,34,0.07); --code-bg:#0a0f1a; --code-border:#1e2d42;
+  --tag-bg:rgba(14,96,144,0.1); --tag-border:#0E6090; --tag-color:#0E6090;
+  --mblock-bg:#f2f4f6; --sidebar-bg:#f2f4f6; --sidebar-border:#D8E4EC;
+  --font-body:Georgia, serif;
+}
+:root.gunmetal {
+  --bg:#030A14; --surface:#030A14; --border:#708898;
+  --text:#C0D0DC; --sub:#7090a8; --acc:#38B8E0; --silver:#C0D0DC;
+  --grid:rgba(192,208,220,0.09); --code-bg:#040810; --code-border:#708898;
+  --tag-bg:rgba(56,184,224,0.08); --tag-border:#38B8E0; --tag-color:#38B8E0;
+  --mblock-bg:#0A1C30; --sidebar-bg:#030A14; --sidebar-border:#708898;
+  --font-body:Georgia, serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Garamond',Georgia,serif;line-height:1.78;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;overflow-x:auto;}
+.shell{display:flex;min-height:100vh;max-width:1600px;margin:0 auto;min-width:700px;}
+.toc{width:230px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:2rem 0 4rem;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .25s,border-color .25s;}
+.toc-head{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);padding:0 1.3rem .9rem;border-bottom:1px solid var(--sidebar-border);margin-bottom:.7rem;}
+.toc a{display:block;font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--sub);text-decoration:none;padding:.25rem 1.3rem;border-left:2px solid transparent;transition:color .12s,background .12s;line-height:1.45;}
+.toc a:hover{color:var(--acc);background:var(--tag-bg);}
+.toc a.active{color:var(--acc);border-left-color:var(--acc);background:var(--tag-bg);}
+.toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
+.toc a.h3{padding-left:2rem;}
+.toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
+.tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
+.tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
+.tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
+.tsw.on::after{transform:translateX(15px);}
+.main{flex:1;padding:3.5rem clamp(1.5rem,5vw,5rem) 6rem;min-width:0;}
+.rh{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.rl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:.8rem;}
+.rt{font-size:2.3rem;font-weight:500;color:var(--text);margin-bottom:.4rem;line-height:1.15;}
+h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
+h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
+h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
+p{margin-bottom:.85rem;}
+strong{font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:var(--tag-bg);color:var(--tag-color);border:1px solid var(--tag-border);border-radius:3px;padding:1px 7px;margin-bottom:.55rem;}
+.katex-display{margin:1.1rem 0!important;padding:.9rem 1.4rem;background:var(--mblock-bg);border-left:3px solid var(--acc);border-radius:0 4px 4px 0;overflow-x:auto;transition:background .25s;}
+.ctog{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.35rem 0;margin-top:.3rem;border:none;background:none;}
+.ctog:hover{color:var(--acc);}
+.ar{display:inline-block;transition:transform .18s;}
+.ctog.open .ar{transform:rotate(90deg);}
+.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw.open{display:block;}
+pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
+.toc::-webkit-scrollbar{width:4px;}
+.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toc-head">Contents</div>
+  <a href="#1-introduction" class="h2">1. Introduction</a>
+  <a href="#2-key-compounds" class="h2">2. Key Compounds</a>
+  <a href="#2-1-caffeine" class="h3">2.1 Caffeine</a>
+  <a href="#2-2-chlorogenic-acids" class="h3">2.2 Chlorogenic Acids</a>
+  <a href="#2-3-maillard-reaction-and-caramelisation" class="h3">2.3 Maillard Reaction and Caramelisation</a>
+  <a href="#3-extraction-kinetics" class="h2">3. Extraction Kinetics</a>
+  <a href="#3-1-the-extraction-yield" class="h3">3.1 The Extraction Yield</a>
+  <a href="#3-2-a-simple-diffusion-model" class="h3">3.2 A Simple Diffusion Model</a>
+  <a href="#4-numerical-experiment" class="h2">4. Numerical Experiment</a>
+  <a href="#4-1-extraction-curves" class="h3">4.1 Extraction Curves</a>
+  <a href="#4-2-caffeine-pharmacokinetics" class="h3">4.2 Caffeine Pharmacokinetics</a>
+  <div class="tswrap">
+    <span>Navy</span>
+    <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
+    <span>Gunmetal</span>
+  </div>
+</nav>
+<main class="main">
+  <header class="rh">
+    <div class="rl">Chemistry Report</div>
+    <h1 class="rt">The Chemistry of Coffee</h1>
+  </header>
+<h2 class="stitle" id="1-introduction">1. Introduction</h2>
+
+<p>A cup of coffee contains over 1,000 distinct chemical compounds. Its flavour, aroma, and stimulant effect arise from a precise interplay of alkaloids, acids, sugars, lipids, and volatile organic compounds — all shaped by roasting temperature, grind size, water chemistry, and extraction time. Understanding the chemistry behind coffee is, in a sense, understanding a small-scale chemical reactor that fits in your kitchen.</p>
+
+<h2 class="stitle" id="2-key-compounds">2. Key Compounds</h2>
+
+<h3 class="sstitle" id="2-1-caffeine">2.1 Caffeine</h3>
+
+<p>Caffeine (\(\text{C}_8\text{H}_{10}\text{N}_4\text{O}_2\), molar mass \(194.19\,\text{g/mol}\)) is a methylxanthine alkaloid. It competitively inhibits adenosine receptors (primarily \(\text{A}_1\) and \(\text{A}_{2A}\)), blocking the accumulation of the sleep-promoting nucleoside adenosine. Its half-life in the human body is approximately \(5\)–\(6\) hours, though this varies with liver enzyme activity (CYP1A2 polymorphisms).</p>
+<p>A standard espresso (\(\sim 30\,\text{mL}\)) contains roughly \(60\)–\(80\,\text{mg}\) of caffeine; a drip-brew cup (\(\sim 240\,\text{mL}\)) contains \(90\)–\(150\,\text{mg}\).</p>
+
+<h3 class="sstitle" id="2-2-chlorogenic-acids">2.2 Chlorogenic Acids</h3>
+
+<p>Chlorogenic acids (CGAs) are esters of hydroxycinnamic acids (primarily caffeic acid) with quinic acid. They account for \(6\)–\(12\%\) of the dry weight of green coffee and are the primary source of the perceived acidity and bitterness after roasting. During roasting, CGAs hydrolyse and isomerise into quinolactones, which are among the most bitter compounds in coffee. The degree of CGA degradation is a direct proxy for roast degree.</p>
+
+<h3 class="sstitle" id="2-3-maillard-reaction-and-caramelisation">2.3 Maillard Reaction and Caramelisation</h3>
+
+<p>The brown colour and toasted aroma of roasted coffee arise from two non-enzymatic browning reactions:</p>
+<p>- <strong>Maillard reaction</strong>: between reducing sugars and amino acids, producing hundreds of heterocyclic compounds (pyrazines, furans, thiophenes) responsible for roasted, nutty, and caramel-like notes. Begins at \(\sim 140^\circ\text{C}\).
+- <strong>Caramelisation</strong>: thermal degradation of sucrose and other sugars at \(\sim 170^\circ\text{C}\), yielding caramel flavour compounds and CO\(_2\).</p>
+<p>Both reactions depend critically on temperature and time, making roast profiling as much chemistry as craft.</p>
+
+<h2 class="stitle" id="3-extraction-kinetics">3. Extraction Kinetics</h2>
+
+<h3 class="sstitle" id="3-1-the-extraction-yield">3.1 The Extraction Yield</h3>
+
+<p>The <strong>extraction yield</strong> (EY) is the fraction of soluble mass extracted from the grounds:</p>
+\[\text{EY} = \frac{m_{\text{dissolved}}}{m_{\text{grounds}}}\]
+<p>The Specialty Coffee Association defines the ideal EY window as \(18\)–\(22\%\). Under-extraction (\(<18\%\)) gives sour, grassy flavours; over-extraction (\(>22\%\)) gives harsh bitterness. EY depends on grind size \(d\), water temperature \(T\), contact time \(t\), and pressure \(P\).</p>
+
+<h3 class="sstitle" id="3-2-a-simple-diffusion-model">3.2 A Simple Diffusion Model</h3>
+
+<p>Soluble compounds diffuse out of a spherical coffee particle of radius \(R\) into the surrounding water. Assuming first-order kinetics with rate constant \(k\), the concentration of solubles in solution \(C(t)\) evolves as</p>
+\[\frac{dC}{dt} = k\bigl(C_{\text{eq}} - C(t)\bigr)\]
+<p>with solution \(C(t) = C_{\text{eq}}\left(1 - e^{-kt}\right)\). The rate \(k\) increases with temperature (Arrhenius) and decreases with particle size (\(k \propto R^{-2}\) from Fick's law), which is why finer grinds extract faster.</p>
+
+<h2 class="stitle" id="4-numerical-experiment">4. Numerical Experiment</h2>
+
+<h3 class="sstitle" id="4-1-extraction-curves">4.1 Extraction Curves</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import numpy as np
+import matplotlib.pyplot as plt
+
+t = np.linspace(0, 300, 500)  # seconds
+
+# First-order extraction model C(t) = C_eq * (1 - exp(-k*t))
+# k scales inversely with grind size^2 and with temperature via Arrhenius
+scenarios = [
+    ('Coarse grind, 90°C',  0.010),
+    ('Medium grind, 90°C', 0.018),
+    ('Fine grind, 90°C',   0.030),
+    ('Fine grind, 95°C',   0.040),
+]
+
+C_eq = 22.0  # % max extractable
+
+fig, ax = plt.subplots(figsize=(8, 4))
+for label, k in scenarios:
+    C = C_eq * (1 - np.exp(-k * t))
+    ax.plot(t, C, label=label, linewidth=2)
+
+ax.axhspan(18, 22, alpha=0.15, color='green', label='SCA ideal range (18–22%)')
+ax.set_xlabel('Extraction time (s)')
+ax.set_ylabel('Extraction yield (%)')
+ax.set_title('Coffee Extraction Curves (First-Order Diffusion Model)')
+ax.legend(fontsize=8)
+plt.tight_layout()
+plt.show()</pre></div>
+<h3 class="sstitle" id="4-2-caffeine-pharmacokinetics">4.2 Caffeine Pharmacokinetics</h3>
+
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre># One-compartment pharmacokinetic model: oral caffeine absorption and elimination
+# dC/dt = F * D * k_a * exp(-k_a * t) / V - k_e * C
+# Closed-form solution:
+# C(t) = (F * D * k_a) / (V * (k_a - k_e)) * (exp(-k_e*t) - exp(-k_a*t))
+
+F = 1.0        # bioavailability (nearly 100% for caffeine)
+D = 80.0       # dose (mg)
+k_a = 0.693 / 0.75   # absorption half-life ~45 min
+k_e = 0.693 / 5.5    # elimination half-life ~5.5 h
+V = 40.0       # apparent volume of distribution (L)
+
+t_h = np.linspace(0, 24, 500)  # hours
+C_plasma = (F * D * k_a) / (V * (k_a - k_e)) * (np.exp(-k_e * t_h) - np.exp(-k_a * t_h))
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(t_h, C_plasma, linewidth=2, color='saddlebrown')
+ax.axhline(1.5, color='gray', linestyle='--', label='typical alertness threshold (~1.5 mg/L)')
+ax.set_xlabel('Time after dose (h)')
+ax.set_ylabel('Plasma concentration (mg/L)')
+ax.set_title('Caffeine Pharmacokinetics (80 mg oral dose)')
+ax.legend()
+plt.tight_layout()
+plt.show()</pre></div>
+  <footer class="rf">
+    <div>The Chemistry of Coffee &mdash; Chemistry Report</div>
+    <div id="theme-lbl">Navy Vault</div>
+  </footer>
+</main>
+</div>
+<script>
+function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function toggleTheme(){
+  const dark=document.documentElement.classList.toggle('gunmetal');
+  document.documentElement.classList.toggle('navy',!dark);
+  document.getElementById('tsw').classList.toggle('on',dark);
+  document.getElementById('theme-lbl').textContent=dark?'Gunmetal':'Navy Vault';
+}
+(function(){
+  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+        if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean).forEach(t=>obs.observe(t));
+})();
+</script>
+</body>
+</html>
