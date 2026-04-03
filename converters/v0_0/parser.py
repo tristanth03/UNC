@@ -33,7 +33,7 @@ def extract_heading(src):
         line = line.strip()
         if not line:
             continue
-        m = re.match(r'^(#{1,4})\s+(.*)', line)
+        m = re.match(r'^(#{1,5})\s+(.*)', line)
         if m:
             return len(m.group(1)), m.group(2).strip()
         return None
