@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Experiment Banana</title>
+<title>Sin Experiment</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
@@ -42,6 +42,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Gar
 .toc a.h2{color:var(--text);font-size:.65rem;margin-top:.3rem;}
 .toc a.h3{padding-left:2rem;}
 .toc a.h4{padding-left:2.8rem;}
+.toc a.h5{padding-left:3.6rem;font-size:.58rem;}
 .tswrap{display:flex;align-items:center;gap:.5rem;padding:1rem 1.3rem 0;font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.07em;text-transform:uppercase;color:var(--silver);}
 .tsw{position:relative;width:32px;height:17px;background:var(--border);border-radius:9px;cursor:pointer;border:1px solid var(--acc);flex-shrink:0;transition:background .2s;}
 .tsw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--acc);border-radius:50%;transition:transform .2s;}
@@ -53,6 +54,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body),'EB Gar
 h2.stitle{font-size:1.25rem;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-top:2.5rem;}
 h3.sstitle{font-size:1.05rem;font-weight:500;color:var(--text);margin:1.6rem 0 .6rem;}
 h4.ssstitle{font-size:.95rem;font-weight:400;color:var(--sub);margin:1.3rem 0 .5rem;font-style:italic;}
+h5.sssstitle{font-size:.88rem;font-weight:400;color:var(--silver);margin:1.1rem 0 .4rem;font-style:italic;letter-spacing:.01em;}
 p{margin-bottom:.85rem;}
 strong{font-weight:600;}
 code{font-family:'JetBrains Mono',monospace;font-size:.78em;background:var(--tag-bg);padding:1px 4px;border-radius:3px;}
@@ -68,6 +70,11 @@ pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color
 .rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
 .toc::-webkit-scrollbar{width:4px;}
 .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.tbl-wrap{overflow-x:auto;margin:1rem 0 1.2rem;}
+table{border-collapse:collapse;font-size:.92rem;width:100%;}
+th,td{border:1px solid var(--border);padding:.45rem .8rem;text-align:left;vertical-align:top;}
+th{background:var(--tag-bg);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;font-weight:500;color:var(--acc);}
+tr:nth-child(even) td{background:rgba(0,0,0,.02);}
 
 </style>
 </head>
@@ -76,7 +83,10 @@ pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color
 <nav class="toc" id="toc">
   <div class="toc-head">Contents</div>
   <a href="#1-introduction" class="h2">1. Introduction</a>
-  <a href="#2-the-theory" class="h2">2. The Theory</a>
+  <a href="#2-the-mathematics" class="h2">2. The mathematics</a>
+  <a href="#3-interesting-results" class="h2">3. Interesting results</a>
+  <a href="#3-1-taylor-approximation" class="h3">3.1 Taylor Approximation</a>
+  <a href="#3-1-1-error" class="h2">3.1.1 Error</a>
   <div class="tswrap">
     <span>Navy</span>
     <div class="tsw" id="tsw" onclick="toggleTheme()"></div>
@@ -86,19 +96,66 @@ pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color
 <main class="main">
   <header class="rh">
     <div class="rl">Research Report</div>
-    <h1 class="rt">Experiment Banana</h1>
+    <h1 class="rt">Sin Experiment</h1>
   </header>
 <h2 class="stitle" id="1-introduction">1. Introduction</h2>
 
-<p>Experiment Banana is rather interestingg.</p>
+<p>Sinus is a beautiful function, it oscilates, and applies in many fields.</p>
 
-<h2 class="stitle" id="2-the-theory">2. The Theory</h2>
+<h2 class="stitle" id="2-the-mathematics">2. The mathematics</h2>
 
-<p>The banana function \(B : \mathbb{S} \to \mathcal{T}\)</p>
-\[B(x) = \begin{cases}\hat{\varepsilon}^{\theta_{\gamma}},& \text{if} \, \, x \in \mathbb{S}\\ \emptyset,& \text{if} \, \, x \notin  \mathbb{S}\end{cases}\]
+<span class="tag">Definition</span> <br>
+<p>Sinus is defined as a real mapping \(f: \mathbb{R} \to [-1,1]\), below is the 4th degree truncated Taylor approximations</p>
+\[f(x) = \sin(x) \approx x-\frac{x^3}{3!}+\frac{x^5}{5!}-\frac{x^7}{7!} + \mathcal{O}(x^9)\]
 
+<h2 class="stitle" id="3-interesting-results">3. Interesting results</h2>
+
+<h3 class="sstitle" id="3-1-taylor-approximation">3.1 Taylor Approximation</h3>
+
+<button class="ctog" onclick="tog('code-1',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-1"><pre>import numpy as np
+import matplotlib.pyplot as plt
+
+n = np.arange(10,10000,1000)
+l_domain = -3/2*np.pi
+u_domain = 3/2*np.pi
+X = [np.linspace(l_domain,u_domain,i) for i in n]
+Y = []
+Z = []
+for i in range(len(n)):
+    Y.append(np.sin(X[i]))
+    Z.append(X[i]-(X[i]**3)/6+(X[i]**5)/120-(X[i]**7)/5040)
+
+plt.suptitle(fr"$\sin(x)$ on $[-3/2 \pi, 3/2 \pi]$")
+plt.subplot(2,1,1)
+plt.plot(X[0],Y[0],'.',label="val") # Banana
+plt.plot(X[0],Z[0],label="4th Taylor")
+plt.title(f"n={n[0]}")
+plt.subplot(2,1,2)
+plt.plot(X[8],Y[8],'.',label="val") # What? Banana?
+plt.plot(X[8],Z[8],label="4th Taylor")
+plt.title(f"n={n[8]}")
+plt.xlabel("x")
+
+plt.tight_layout()
+
+plt.show()</pre></div>
+<span class="tag">Proposition </span> <br>
+<p>Proposition:</p>
+\[2\sin(x/2)cos(x/2) = sin(x)\]
+
+<h2 class="stitle" id="3-1-1-error">3.1.1 Error</h2>
+
+<button class="ctog" onclick="tog('code-2',this)"><span class="ar">&#9658;</span> Source code</button>
+<div class="cdraw" id="code-2"><pre>y_ = 2*np.sin(X[8]/2)*np.cos(X[8]/2)
+plt.plot(X[8],np.abs(Y[8] - y_)) # Residual
+plt.title("Trigonometric idienty (error ~float prec)\n"+fr"$2\sin(x/2)cos(x/2) = sin(x)$")
+plt.show()
+
+plt.plot(X[8],np.abs(Y[8]-Z[8])) # Taylor Approximation Error
+plt.show()</pre></div>
   <footer class="rf">
-    <div>Experiment Banana &mdash; Research Report</div>
+    <div>Sin Experiment &mdash; Research Report</div>
     <div id="theme-lbl">Navy Vault</div>
   </footer>
 </main>
