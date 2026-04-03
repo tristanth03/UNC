@@ -45,19 +45,18 @@ html.show-src .ctog{display:flex;}
 html.show-out .otog{display:flex;}
 .ar{display:inline-block;transition:transform .18s;}
 .ctog.open .ar,.otog.open .ar{transform:rotate(90deg);}
-.cdraw{display:none;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
+.cdraw{display:none;position:relative;background:var(--code-bg);border:1px solid var(--code-border);border-radius:4px;padding:.8rem 1rem;margin-top:.3rem;overflow-x:auto;transition:background .25s;}
 .cdraw.open{display:block;}
 pre{font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.6;color:#a8c0d0;white-space:pre;}
+.cpybtn{position:absolute;top:.4rem;right:.5rem;font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;color:var(--silver);background:none;border:1px solid var(--border);border-radius:3px;padding:1px 6px;cursor:pointer;transition:color .12s,border-color .12s;}
+.cpybtn:hover{color:var(--acc);border-color:var(--acc);}
 .rf{border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--silver);}
 .toc::-webkit-scrollbar{width:4px;}
 .toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .cell-out{border-left:3px solid var(--border);border-radius:0 4px 4px 0;padding:.65rem 1rem;overflow-x:auto;}
 .cell-out pre{color:var(--sub);}
-.gswrap{padding:.55rem 1.3rem .7rem;border-top:1px solid var(--sidebar-border);margin-top:.4rem;}
-.gsw{display:flex;align-items:center;gap:.5rem;width:100%;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--silver);cursor:pointer;padding:.28rem 0;border:none;background:none;text-align:left;}
-.gsw:hover,.gsw.on{color:var(--acc);}
-.gar{display:inline-block;font-size:.55rem;transition:transform .18s;}
-.gsw.on .gar{transform:rotate(90deg);}
+.vwrap{padding:.6rem 1.3rem 0;border-top:1px solid var(--sidebar-border);margin-top:.6rem;}
+.vwrap .tswrap{padding:.3rem 0 0;}
 .plot-fig{margin:1.2rem 0 1.6rem;text-align:center;}
 .plot-cap{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:.45rem;}
 .plot-img{max-width:100%;border-radius:4px;border:1px solid var(--border);}
@@ -72,11 +71,19 @@ tr:nth-child(even) td{background:rgba(0,0,0,.02);}
 
 JS = """<script>
 function tog(id,btn){document.getElementById(id).classList.toggle('open');btn.classList.toggle('open');}
+function cpy(btn){
+  var pre=btn.parentElement.querySelector('pre');
+  if(!pre)return;
+  navigator.clipboard.writeText(pre.textContent).then(function(){
+    btn.textContent='copied!';
+    setTimeout(function(){btn.textContent='copy';},1500);
+  });
+}
 function toggleGlobal(type){
   var cls=type==='src'?'show-src':'show-out';
   var btnCls=type==='src'?'.ctog':'.otog';
   var isOn=document.documentElement.classList.toggle(cls);
-  document.getElementById('gsw-'+type).classList.toggle('on',isOn);
+  document.getElementById('tsw-'+type).classList.toggle('on',isOn);
   if(!isOn){
     document.querySelectorAll(btnCls+'.open').forEach(function(b){
       b.classList.remove('open');
@@ -146,13 +153,15 @@ def assemble(title_e, cat_e, toc_html, body):
         '<nav class="toc" id="toc">',
         '  <div class="toc-head">Contents</div>',
         f'  {toc_html}',
-        '  <div class="gswrap">',
-        '    <button class="gsw" id="gsw-src" onclick="toggleGlobal(\'src\')">',
-        '      <span class="gar">&#9658;</span> Source Code',
-        '    </button>',
-        '    <button class="gsw" id="gsw-out" onclick="toggleGlobal(\'out\')">',
-        '      <span class="gar">&#9658;</span> Output',
-        '    </button>',
+        '  <div class="vwrap">',
+        '    <div class="tswrap">',
+        '      <span>Source Code</span>',
+        '      <div class="tsw" id="tsw-src" onclick="toggleGlobal(\'src\')"></div>',
+        '    </div>',
+        '    <div class="tswrap">',
+        '      <span>Output</span>',
+        '      <div class="tsw" id="tsw-out" onclick="toggleGlobal(\'out\')"></div>',
+        '    </div>',
         '  </div>',
         '  <div class="tswrap">',
         '    <span>Navy</span>',

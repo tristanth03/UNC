@@ -193,10 +193,11 @@ def render_code_cell(src, outputs):
     n   = _code_counter[0]
     cid = f'code-{n}'
     oid = f'out-{n}'
+    _CPY = '<button class="cpybtn" onclick="cpy(this)">copy</button>'
     parts = [
         f'<button class="ctog" onclick="tog(\'{cid}\',this)">'
         f'<span class="ar">&#9658;</span> Source code</button>',
-        f'<div class="cdraw" id="{cid}"><pre>{esc(src)}</pre></div>',
+        f'<div class="cdraw" id="{cid}">{_CPY}<pre>{esc(src)}</pre></div>',
     ]
 
     # ── stdout (print output) — stderr/warnings are intentionally skipped ──
@@ -212,6 +213,7 @@ def render_code_cell(src, outputs):
         )
         parts.append(
             f'<div class="cdraw" id="{oid}">'
+            f'{_CPY}'
             f'<div class="cell-out"><pre>{esc(stdout_text.rstrip())}</pre></div>'
             f'</div>'
         )
